@@ -1,8 +1,6 @@
 package com.forum.demo.common;
 
 
-
-
 /*
 * 定义返回结果
 * */

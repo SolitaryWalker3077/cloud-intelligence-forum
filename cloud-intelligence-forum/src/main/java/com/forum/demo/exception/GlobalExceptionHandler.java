@@ -4,10 +4,8 @@ package com.forum.demo.exception;
 import com.forum.demo.common.AppResult;
 import com.forum.demo.common.ResultCode;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.context.event.EventListener;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 @Slf4j

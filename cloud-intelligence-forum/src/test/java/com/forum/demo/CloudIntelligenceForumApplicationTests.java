@@ -10,6 +10,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import javax.sql.DataSource;
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.util.UUID;
 
 @SpringBootTest
 class CloudIntelligenceForumApplicationTests {
@@ -41,4 +42,8 @@ class CloudIntelligenceForumApplicationTests {
         System.out.println(user.getUsername());
     }
 
+    @Test
+    void testUUID () {
+        System.out.println(UUID.randomUUID().toString());
+    }
 }
