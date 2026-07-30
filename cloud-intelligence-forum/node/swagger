@@ -1,0 +1,15 @@
+// Swagger2 注解
+@Api // 用于类上
+@ApiOperation // 用于方法上
+@ApiImplicitParams // 用于方法参数
+@ApiImplicitParam // 用于单个参数
+@ApiModel // 用于 DTO 类
+@ApiModelProperty // 用于 DTO 属性
+
+
+// Swagger3 对应注解
+@Tag(name = "接口类描述") // 替代 @Api
+@Operation(summary = "接口方法描述") // 替代 @ApiOperation
+@Parameters // 替代 @ApiImplicitParams
+@Parameter(description = "参数描述") // 替代 @ApiImplicitParam
+@Schema // 替代 @ApiModel 和 @ApiModelProperty
