@@ -1,5 +1,7 @@
 package com.forum.demo.controller;
 
+import com.forum.demo.exception.ApplicationException;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -9,5 +11,14 @@ public class TestController {
     @RequestMapping("t1")
     public String test() {
         return "hhh";
+    }
+
+    @GetMapping("/exception")
+    public String testException() throws Exception {
+        throw new Exception("这是⼀个Exception");
+    }
+    @GetMapping("/appException")
+    public String testApplicationException() {
+        throw new ApplicationException("这是⼀个⾃定义的ApplicationException");
     }
 }
