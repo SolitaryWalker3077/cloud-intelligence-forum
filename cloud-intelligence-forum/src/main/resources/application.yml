@@ -1,0 +1,28 @@
+server:
+  port: 8080
+
+spring:
+  application:
+    name: cloud-intelligence-forum
+  datasource:
+    # 加上 allowPublicKeyRetrieval=true 和 serverTimezone
+    url: jdbc:mysql://127.0.0.1:3306/forum_db?characterEncoding=utf8&useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=Asia/Shanghai
+    username: root
+    password: Cz.200406146737
+    driver-class-name: com.mysql.cj.jdbc.Driver
+# 设置 Mybatis 的 xml 保存路径
+mybatis:
+  mapper-locations: classpath:mapper/*Mapper.xml
+  configuration: # 配置打印 MyBatis 执行的 SQL
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+    map-underscore-to-camel-case: true  #自动驼峰转换
+# ⽇志配置
+logging:
+  level:
+    root: info # 默认⽇志级别
+    com:
+      forum:
+        demo: debug
+  file:
+    name: logs/springboot.log
+
