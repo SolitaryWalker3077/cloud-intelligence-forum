@@ -1,8 +1,8 @@
 package com.forum.demo.controller;
 
-import ch.qos.logback.core.util.MD5Util;
 import com.forum.demo.common.AppResult;
 import com.forum.demo.common.ResultCode;
+import com.forum.demo.config.AppConfig;
 import com.forum.demo.model.User;
 import com.forum.demo.service.IUserService;
 import com.forum.demo.utils.Md5Utils;
@@ -12,6 +12,8 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.annotation.Resource;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpSession;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -70,6 +72,25 @@ public class UserController {
         // 调用Service层
         userService.createNormalUser(user);
         // 返回成功
+        return AppResult.success();
+    }
+
+
+    /**
+     * 用户登录
+     * @param username 用户名
+     * @param password 密码
+     */
+    @Operation(summary = "用户登录")
+    @PostMapping("login")
+    public AppResult login(HttpServletRequest request,
+                      @Parameter(description = "用户名") String username,
+                      @Parameter(description = "密码") String password) {
+
+        User user = userService.login(username,password);
+        // 如果登录成功把User对象设置到Session作用域中
+        HttpSession session = request.getSession(true);
+        session.setAttribute(AppConfig.USER_SESSION, user);
         return AppResult.success();
     }
 }

@@ -18,6 +18,7 @@ class UserServiceImplTest {
 
     @Resource
     private IUserService userService;
+
     @Test
     void createNormalUser() {
         User user = new User();
@@ -36,6 +37,18 @@ class UserServiceImplTest {
         // 调用Service层的方法
         userService.createNormalUser(user);
         // 打印结果
+        System.out.println(user);
+    }
+
+    @Test
+    void selectByUserName() {
+        User user = userService.selectByUserName("testUser11");
+        System.out.println(user);
+    }
+
+    @Test
+    void login() {
+        User user = userService.login("testUser11", "111111");
         System.out.println(user);
     }
 }

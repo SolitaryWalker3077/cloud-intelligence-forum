@@ -6,7 +6,9 @@ import com.forum.demo.dao.UserMapper;
 import com.forum.demo.exception.ApplicationException;
 import com.forum.demo.model.User;
 import com.forum.demo.service.IUserService;
+import com.forum.demo.utils.Md5Utils;
 import com.forum.demo.utils.StringUtil;
+import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -58,5 +60,38 @@ public class UserServiceImpl implements IUserService {
             throw new ApplicationException(AppResult.failed(ResultCode.FAILED_CREATE));
         }
         log.info("新用户注册成功,username = "+ user.getUsername()+". ");
+    }
+
+    @Override
+    public User selectByUserName(String username) {
+        //非空校验
+        if(StringUtil.isEmpty(username)) {
+            log.warn(ResultCode.FAILED_PARAMS_VALIDATE.toString());
+            throw new ApplicationException(AppResult.failed(ResultCode.FAILED_PARAMS_VALIDATE));
+        }
+       return userMapper.selectByUserName(username);
+    }
+
+    @Override
+    public User login(String username, String password) {
+        //非空校验
+        if(StringUtil.isEmpty(username) || StringUtil.isEmpty(password)) {
+            log.warn(ResultCode.FAILED_PARAMS_VALIDATE.toString());
+            throw new ApplicationException(AppResult.failed(ResultCode.FAILED_PARAMS_VALIDATE));
+        }
+        //查询用户名
+        User user = selectByUserName(username);
+        if(user == null) {
+            log.warn(ResultCode. FAILED_LOGIN.toString()+",username:"+username);
+            throw new ApplicationException(AppResult.failed(ResultCode.FAILED_LOGIN));
+        }
+        //  对密码做校验
+        String encryptPassword = Md5Utils.md5Salt(password, user.getSalt());
+        if(!encryptPassword.equalsIgnoreCase(user.getPassword())) {
+            log.warn(ResultCode.FAILED_LOGIN.toString() + "密码错误");
+            throw new ApplicationException(AppResult.failed(ResultCode.FAILED_LOGIN));
+        }
+        log.info(username+",登录成功");
+        return user;
     }
 }
