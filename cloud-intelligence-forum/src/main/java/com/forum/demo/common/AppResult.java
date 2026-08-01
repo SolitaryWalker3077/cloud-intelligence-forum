@@ -1,17 +1,22 @@
 package com.forum.demo.common;
 
 
+import com.fasterxml.jackson.annotation.JsonInclude;
+
 /*
 * 定义返回结果
 * */
 public class AppResult<T> {
 
     //状态码
+    @JsonInclude(JsonInclude.Include.ALWAYS) //不论任何情况,该属性都参加Json序列化
     private int code;
     //状态信息
+    @JsonInclude(JsonInclude.Include.ALWAYS)
     private String message;
 
     //结果数据
+    @JsonInclude(JsonInclude.Include.ALWAYS)
     private T data;
 
 

@@ -13,3 +13,10 @@
 @Parameters // 替代 @ApiImplicitParams
 @Parameter(description = "参数描述") // 替代 @ApiImplicitParam
 @Schema // 替代 @ApiModel 和 @ApiModelProperty
+
+
+Json序列化:就是将Java对象转换为JSON的过程
+在开发的过程中,有些参数不应该传给前台,比如密码,盐值还有修改时间,这时可以给这个对象对应的属性加上@JsonIgnore注解
+
+@JsonInclude(JsonInclude.Include.ALWAYS):
+不论任何情况,该属性都参加Json序列化

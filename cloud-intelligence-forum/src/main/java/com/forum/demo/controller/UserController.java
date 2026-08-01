@@ -16,10 +16,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 
 @Tag(name = "用户接口")
@@ -92,5 +89,45 @@ public class UserController {
         HttpSession session = request.getSession(true);
         session.setAttribute(AppConfig.USER_SESSION, user);
         return AppResult.success();
+    }
+
+    @Operation(summary = "获取用户信息")
+    @GetMapping("info")
+    public AppResult<User> getUserInfo(HttpServletRequest request,
+                                       @Parameter(description = "用户ID") @RequestParam(value = "id",required = false) Long id) {
+        User user = null;
+        //根据id判断User对象获取方式
+        if(id == null) {
+            //如果id为空,就从session当中获得User对象
+            HttpSession session = request.getSession(false);
+            //判断session获取的信息是否有效
+            if(session == null || session.getAttribute(AppConfig.USER_SESSION) == null) {
+                //用户未登录,session无效
+                return AppResult.failed(ResultCode.FAILED_FORBIDDEN);
+            }
+            // 从session中获取当前登录的用户信息
+            user = (User) session.getAttribute(AppConfig.USER_SESSION);
+        }else {
+            // 如果id不为空，从数据库中按Id查询出用户信息
+             user = userService.selectById(id);
+        }
+        // 判断用户对象是否为空
+        if(user == null) {
+            return AppResult.failed(ResultCode.FAILED_USER_NOT_EXISTS);
+        }
+        return AppResult.success(user);
+    }
+
+    @Operation(summary = "用户退出")
+    @GetMapping("logout")
+    public AppResult logout(HttpServletRequest request) {
+        HttpSession session = request.getSession(false);
+        //判断session是否有效
+        //不为空则代表没有退出
+        if(session != null) {
+            log.info("退出成功");
+            session.invalidate();
+        }
+        return AppResult.success("退出成功");
     }
 }
