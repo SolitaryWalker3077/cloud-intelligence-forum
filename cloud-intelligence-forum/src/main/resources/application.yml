@@ -39,3 +39,7 @@ springdoc:
 mvc:
   pathmatch:
     matching-strategy: ANT_PATH_MATCHER #Springfox-Swagger兼容性配置
+
+cloud-intelligence-forum:
+  login:
+      url: sign-in.html # 未登录状况下强制跳转⻚⾯
