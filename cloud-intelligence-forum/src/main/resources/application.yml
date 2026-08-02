@@ -43,3 +43,5 @@ mvc:
 cloud-intelligence-forum:
   login:
       url: sign-in.html # 未登录状况下强制跳转⻚⾯
+  index: # 首页配置节点
+    board-num: 9 # 首页中显示的版块个数
