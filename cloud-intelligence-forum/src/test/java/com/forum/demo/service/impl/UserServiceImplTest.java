@@ -8,6 +8,7 @@ import com.forum.demo.utils.UuidUtil;
 import jakarta.annotation.Resource;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.UUID;
 
@@ -50,5 +51,13 @@ class UserServiceImplTest {
     void login() {
         User user = userService.login("testUser11", "111111");
         System.out.println(user);
+    }
+
+
+    @Transactional
+    @Test
+    void addOneArticleCountById() {
+        userService.addOneArticleCountById(1L);
+        System.out.println("更新成功");
     }
 }

@@ -55,43 +55,43 @@ public class UserServiceImpl implements IUserService {
         user.setUpdateTime(date);
         //新增用户,写入数据库
         int row = userMapper.insertSelective(user);
-        if(row != 1) {
+        if (row != 1) {
             log.warn(ResultCode.FAILED_CREATE.toString());
             throw new ApplicationException(AppResult.failed(ResultCode.FAILED_CREATE));
         }
-        log.info("新用户注册成功,username = "+ user.getUsername()+". ");
+        log.info("新用户注册成功,username = " + user.getUsername() + ". ");
     }
 
     @Override
     public User selectByUserName(String username) {
         //非空校验
-        if(StringUtil.isEmpty(username)) {
+        if (StringUtil.isEmpty(username)) {
             log.warn(ResultCode.FAILED_PARAMS_VALIDATE.toString());
             throw new ApplicationException(AppResult.failed(ResultCode.FAILED_PARAMS_VALIDATE));
         }
-       return userMapper.selectByUserName(username);
+        return userMapper.selectByUserName(username);
     }
 
     @Override
     public User login(String username, String password) {
         //非空校验
-        if(StringUtil.isEmpty(username) || StringUtil.isEmpty(password)) {
+        if (StringUtil.isEmpty(username) || StringUtil.isEmpty(password)) {
             log.warn(ResultCode.FAILED_PARAMS_VALIDATE.toString());
             throw new ApplicationException(AppResult.failed(ResultCode.FAILED_PARAMS_VALIDATE));
         }
         //查询用户名
         User user = selectByUserName(username);
-        if(user == null) {
-            log.warn(ResultCode. FAILED_LOGIN.toString()+",username:"+username);
+        if (user == null) {
+            log.warn(ResultCode.FAILED_LOGIN.toString() + ",username:" + username);
             throw new ApplicationException(AppResult.failed(ResultCode.FAILED_LOGIN));
         }
         //  对密码做校验
         String encryptPassword = Md5Utils.md5Salt(password, user.getSalt());
-        if(!encryptPassword.equalsIgnoreCase(user.getPassword())) {
+        if (!encryptPassword.equalsIgnoreCase(user.getPassword())) {
             log.warn(ResultCode.FAILED_LOGIN.toString() + "密码错误");
             throw new ApplicationException(AppResult.failed(ResultCode.FAILED_LOGIN));
         }
-        log.info(username+",登录成功");
+        log.info(username + ",登录成功");
         return user;
     }
 
@@ -99,12 +99,38 @@ public class UserServiceImpl implements IUserService {
     @Override
     public User selectById(Long id) {
         //非空判断
-        if(id == null) {
+        if (id == null) {
             log.warn(ResultCode.FAILED_PARAMS_VALIDATE.toString());
             throw new ApplicationException(AppResult.failed(ResultCode.FAILED_PARAMS_VALIDATE));
         }
         // 调用DAO查询数据库并获取对象
         User user = userMapper.selectByPrimaryKey(id);
         return user;
+    }
+
+
+    @Override
+    public void addOneArticleCountById(Long id) {
+        if (id == null || id <= 0) {
+            log.warn(ResultCode.FAILED_BOARD_ARTICLE_COUNT.toString());
+            throw new ApplicationException(AppResult.failed(ResultCode.FAILED_BOARD_ARTICLE_COUNT));
+        }
+
+        User user = userMapper.selectByPrimaryKey(id);
+        if (user == null) {
+            // 打印日志
+            log.warn(ResultCode.ERROR_IS_NULL.toString() + ", user id = " + id);
+            // 抛出异常
+            throw new ApplicationException(AppResult.failed(ResultCode.ERROR_IS_NULL));
+        }
+        //更新用户发帖数量
+        User updateUser = new User();
+        updateUser.setId(user.getId());
+        updateUser.setArticleCount(user.getArticleCount() + 1);
+        int row = userMapper.updateByPrimaryKeySelective(updateUser);
+        if (row != 1) {
+            log.warn(ResultCode.FAILED.toString() + ", 受影响的行数不等于 1 .");
+            throw new ApplicationException(AppResult.failed(ResultCode.FAILED));
+        }
     }
 }

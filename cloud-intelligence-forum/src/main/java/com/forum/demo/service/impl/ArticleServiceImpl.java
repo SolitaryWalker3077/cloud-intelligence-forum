@@ -1,0 +1,81 @@
+package com.forum.demo.service.impl;
+
+
+import com.forum.demo.common.AppResult;
+import com.forum.demo.common.ResultCode;
+import com.forum.demo.dao.ArticleMapper;
+import com.forum.demo.exception.ApplicationException;
+import com.forum.demo.model.Article;
+import com.forum.demo.model.Board;
+import com.forum.demo.model.User;
+import com.forum.demo.service.IArticleService;
+import com.forum.demo.service.IBoardService;
+import com.forum.demo.service.IUserService;
+import com.forum.demo.utils.StringUtil;
+import jakarta.annotation.Resource;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Service;
+
+import java.util.Date;
+
+@Slf4j
+@Service
+public class ArticleServiceImpl implements IArticleService {
+
+    @Resource
+    private ArticleMapper articleMapper;
+
+    @Resource
+    private IUserService userService;
+    @Resource
+    private IBoardService boardService;
+
+    @Override
+    public void create(Article article) {
+        //非空校验
+        if(article == null || article.getBoardId() == null || article.getUserId() == null
+            || StringUtil.isEmpty(article.getTitle())
+            || StringUtil.isEmpty(article.getContent())) {
+            log.warn(ResultCode.FAILED_PARAMS_VALIDATE.toString());
+            throw new ApplicationException(AppResult.failed(ResultCode.FAILED_PARAMS_VALIDATE));
+        }
+        // 设置默认值
+        article.setVisitCount(0); // 访问数
+        article.setReplyCount(0); // 回复数
+        article.setLikeCount(0);  // 点赞数
+        article.setDeleteState((byte) 0);
+        article.setState((byte) 0);
+        Date date = new Date();
+        article.setCreateTime(date);
+        article.setUpdateTime(date);
+        // 写入数据库
+        int articleRow = articleMapper.insertSelective(article);
+        if(articleRow<=0) {
+            log.warn(ResultCode.FAILED_CREATE.toString());
+            throw new ApplicationException(AppResult.failed(ResultCode.FAILED_CREATE));
+        }
+
+        // 获取用户信息
+        User user = userService.selectById(article.getId());
+        //没有找到指定用户信息
+        if(user == null) {
+            log.warn(ResultCode.FAILED_CREATE.toString() + ", 发贴失败, user id = " + article.getBoardId());
+            throw new ApplicationException(AppResult.failed(ResultCode.FAILED_CREATE));
+        }
+        // 更新用户的发贴数
+        userService.addOneArticleCountById(user.getId());
+
+        Board board = boardService.selectById(article.getId());
+        //没有找到指定板块
+        if(board == null) {
+            log.warn(ResultCode.FAILED_CREATE.toString() + ", 发贴失败, board id = " + article.getBoardId());
+            throw new ApplicationException(AppResult.failed(ResultCode.FAILED_CREATE));
+        }
+        //更新
+        boardService.addOneArticleCountById(article.getId());
+
+        // 打印日志
+        log.info(ResultCode.SUCCESS.toString() + ", user id = " + article.getUserId()
+                + ", board id = " + article.getBoardId() + ", article id = "+article.getId() + "发帖成功");
+    }
+}
