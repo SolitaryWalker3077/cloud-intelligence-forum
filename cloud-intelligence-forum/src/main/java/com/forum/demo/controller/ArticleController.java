@@ -22,6 +22,9 @@ import org.apache.ibatis.annotations.Param;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.HandlerInterceptor;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @Slf4j
 @Tag(name = "文章接口")
 @RestController
@@ -73,5 +76,18 @@ public class ArticleController {
         articleService.create(article);
 
         return AppResult.success();
+    }
+
+
+    @Operation(summary = "根据版块Id查询帖⼦列表")
+    @GetMapping("/getAllByBoardId")
+    public AppResult<List<Article>> getAllByBoardId(@Parameter(description = "板块id") @RequestParam(value = "boardId",required = false)  Long boardId) {
+        //查询所有列表
+        List<Article> articles = articleService.selectAll();
+        if(articles == null) {
+            //非空校验
+            articles = new ArrayList<>();
+        }
+        return AppResult.success(articles);
     }
 }
