@@ -31,4 +31,7 @@ public class Article {
 
     private String content;
 
+    // ⽤⼾信息
+    private User user;
+
 }

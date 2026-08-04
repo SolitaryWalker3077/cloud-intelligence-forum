@@ -17,6 +17,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.util.Date;
+import java.util.List;
 
 @Slf4j
 @Service
@@ -77,5 +78,12 @@ public class ArticleServiceImpl implements IArticleService {
         // 打印日志
         log.info(ResultCode.SUCCESS.toString() + ", user id = " + article.getUserId()
                 + ", board id = " + article.getBoardId() + ", article id = "+article.getId() + "发帖成功");
+    }
+
+
+    @Override
+    public List<Article> selectAll() {
+        List<Article> articles = articleMapper.selectAll();
+        return articles;
     }
 }

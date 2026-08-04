@@ -1,6 +1,7 @@
 package com.forum.demo.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
@@ -34,6 +35,7 @@ public class User {
     private String salt;
 
     @Schema(description = "头像地址")
+    @JsonInclude(JsonInclude.Include.ALWAYS) // 强制参与JSON序列化
     private String avatarUrl;
 
     @Schema(description = "文章数量")
