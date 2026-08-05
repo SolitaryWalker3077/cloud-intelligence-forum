@@ -130,4 +130,42 @@ public class ArticleServiceImpl implements IArticleService {
         article.setVisitCount(article.getVisitCount()+1);
         return article;
     }
+
+
+    @Override
+    public Article selectById(Long id) {
+        if(id == null || id <= 0) {
+            // 打印日志
+            log.warn(ResultCode.FAILED_PARAMS_VALIDATE.toString());
+            // 抛出异常
+            throw new ApplicationException(AppResult.failed(ResultCode.FAILED_PARAMS_VALIDATE));
+        }
+        Article article = articleMapper.selectByPrimaryKey(id);
+        return article;
+    }
+
+    @Override
+    public void modify(Long id, String title, String content) {
+        //非空校验
+        if(id == null || id <= 0 || StringUtil.isEmpty(title)
+        ||StringUtil.isEmpty(content)) {
+            log.warn(ResultCode.FAILED_PARAMS_VALIDATE.toString());
+            throw new ApplicationException(AppResult.failed(ResultCode.FAILED_PARAMS_VALIDATE));
+        }
+
+        //更新数据
+        Article updatearticle = new Article();
+        updatearticle.setId(id);
+        updatearticle.setTitle(title);
+        updatearticle.setContent(content);
+        updatearticle.setUpdateTime(new Date());
+        //调用dao
+        int row = articleMapper.updateByPrimaryKeySelective(updatearticle);
+        if(row != 1) {
+            // 打印日志
+            log.warn(ResultCode.ERROR_SERVICES.toString());
+            // 抛出异常
+            throw new ApplicationException(AppResult.failed(ResultCode.ERROR_SERVICES));
+        }
+    }
 }

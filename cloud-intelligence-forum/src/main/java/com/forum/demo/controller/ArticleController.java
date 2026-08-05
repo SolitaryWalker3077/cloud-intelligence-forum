@@ -12,6 +12,7 @@ import com.forum.demo.service.IBoardService;
 import com.forum.demo.service.impl.BoardServiceImpl;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.annotation.Resource;
 import jakarta.servlet.http.HttpServletRequest;
@@ -117,4 +118,35 @@ public class ArticleController {
         return AppResult.success(article);
     }
 
+    @Operation(summary = "更改帖子")
+    @PostMapping("/modify")
+    public AppResult modify(HttpServletRequest request,
+                            @Parameter(description = "帖子id") @RequestParam("id") @NonNull Long id,
+                            @Parameter(description = "帖子标题") @RequestParam("title") @NonNull String title,
+                            @Parameter(description = "帖子正文") @RequestParam("content") @NonNull String content) {
+
+        //从session中获取当前登录的用户
+        HttpSession session = request.getSession(false);
+        User user = (User) session.getAttribute(AppConfig.USER_SESSION);
+
+        // 校验用户状态
+        if(user.getState() == 1) {
+            // 返回错误描述
+            return AppResult.failed(ResultCode.FAILED_USER_BANNED);
+        }
+        // 查询帖子详情
+        Article article = articleService.selectById(id);
+        if (article == null) {
+            // 返回帖子不存在
+            return AppResult.failed(ResultCode.FAILED_ARTICLE_NOT_EXISTS);
+        }
+        // 判断帖子的状态 - 已归档
+        if(article.getState() == 1 || article.getDeleteState() == 1) {
+            return AppResult.failed(ResultCode.FAILED_ARTICLE_BANNED);
+        }
+
+        articleService.modify(id, title, content);
+        log.info("帖子更新成功. Article id = " + id + "User id = " + user.getId() + ".");
+        return AppResult.success();
+    }
 }

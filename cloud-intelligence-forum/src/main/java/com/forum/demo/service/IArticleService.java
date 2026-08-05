@@ -1,6 +1,7 @@
 package com.forum.demo.service;
 
 import com.forum.demo.model.Article;
+import io.swagger.v3.oas.models.security.SecurityScheme;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
@@ -36,4 +37,20 @@ public interface IArticleService {
      * @return 帖子详情
      */
     Article selectDetailById(Long id);
+
+
+    /**
+     * 根据帖子Id查询记录
+     * @param id 帖子Id
+     * @return
+     */
+    Article selectById(Long id);
+
+    /**
+     * 编辑帖子
+     * @param id 帖子Id
+     * @param title 帖子标题
+     * @param content 帖子正文
+     */
+    void modify(Long id,String title,String content);
 }
