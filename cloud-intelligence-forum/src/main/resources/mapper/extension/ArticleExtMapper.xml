@@ -55,4 +55,37 @@
         order by a.createTime desc
         limit 0, 100
     </select>
+
+    <!-- 根据Id查询帖⼦详情 -->
+    <select id="selectDetailById" resultMap="AllInfoResultMap" parameterType="java.lang.Long">
+        select u.id          as u_id,
+               u.avatarUrl   as u_avatarUrl,
+               u.nickname    as u_nickname,
+               u.gender      as u_gender,
+               u.isAdmin     as u_isAdmin,
+               u.state       as u_state,
+               u.deleteState as u_deleteState,
+               b.id          as b_id,
+               b.name        as b_name,
+               b.state       as b_state,
+               b.deleteState as b_deleteState,
+               a.id,
+               a.boardId,
+               a.userId,
+               a.title,
+               a.content,
+               a.visitCount,
+               a.replyCount,
+               a.likeCount,
+               a.state,
+               a.createTime,
+               a.updateTime
+        from t_article a,
+             t_user u,
+             t_board b
+        where a.userId = u.id
+          and a.boardId = b.id
+          and a.deleteState = 0
+          and a.id = #{id,jdbcType=BIGINT}
+    </select>
 </mapper>

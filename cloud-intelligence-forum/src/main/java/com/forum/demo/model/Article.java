@@ -1,5 +1,6 @@
 package com.forum.demo.model;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
 import java.util.Date;
@@ -30,6 +31,9 @@ public class Article {
     private Date updateTime;
 
     private String content;
+
+    @Schema(description = "是否为作者")
+    private Boolean own;
 
     // ⽤⼾信息
     private User user;

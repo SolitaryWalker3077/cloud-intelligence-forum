@@ -103,4 +103,31 @@ public class ArticleServiceImpl implements IArticleService {
         List<Article> articles = articleMapper.selectAllByBoardId(boardId);
         return articles;
     }
+
+    @Override
+    public Article selectDetailById(Long id) {
+        if(id == null || id <= 0) {
+            log.warn(ResultCode.FAILED_PARAMS_VALIDATE.toString());
+            throw new ApplicationException(AppResult.failed(ResultCode.FAILED_PARAMS_VALIDATE));
+        }
+        //调用dao
+        Article article = articleMapper.selectDetailById(id);
+        if(article == null) {
+            log.warn(ResultCode.FAILED_ARTICLE_NOT_EXISTS.toString());
+            throw new ApplicationException(AppResult.failed(ResultCode.FAILED_ARTICLE_NOT_EXISTS));
+        }
+        // 更新帖子的访问次数
+        Article updateArticle = new Article();
+        updateArticle.setId(article.getId());
+        updateArticle.setVisitCount(article.getVisitCount()+1);
+        // 保存到数据库
+        int row = articleMapper.updateByPrimaryKeySelective(updateArticle);
+        if(row != 1) {
+            log.warn(ResultCode.ERROR_SERVICES.toString());
+            throw new ApplicationException(AppResult.failed(ResultCode.ERROR_SERVICES));
+        }
+        // 更新返回对象的访问次数
+        article.setVisitCount(article.getVisitCount()+1);
+        return article;
+    }
 }
