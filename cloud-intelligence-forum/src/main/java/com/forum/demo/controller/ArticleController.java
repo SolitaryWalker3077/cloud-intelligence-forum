@@ -36,10 +36,12 @@ public class ArticleController {
     private IArticleService articleService;
     @Resource
     private IBoardService boardService;
+
     /**
      * 发布新帖子
+     *
      * @param boardId 版块Id
-     * @param title 文章标题
+     * @param title   文章标题
      * @param content 文章内容
      * @return
      */
@@ -53,15 +55,15 @@ public class ArticleController {
 
         //检测用户是否禁言
         HttpSession session = request.getSession(false);
-        User user = (User)session.getAttribute(AppConfig.USER_SESSION);
-        if(user.getState() == 1) {
+        User user = (User) session.getAttribute(AppConfig.USER_SESSION);
+        if (user.getState() == 1) {
             //用户已禁言
             return AppResult.failed(ResultCode.FAILED_USER_BANNED);
         }
         //获取板块信息
         Board board = boardService.selectById(boardId.longValue());
         //校验
-        if(board == null || board.getState() ==1 || board.getDeleteState() == 1) {
+        if (board == null || board.getState() == 1 || board.getDeleteState() == 1) {
             // 打印日志
             log.warn(ResultCode.FAILED_BOARD_BANNED.toString());
             // 返回响应
@@ -82,15 +84,15 @@ public class ArticleController {
 
     @Operation(summary = "根据版块Id查询帖⼦列表")
     @GetMapping("/getAllByBoardId")
-    public AppResult<List<Article>> getAllByBoardId(@Parameter(description = "板块id") @RequestParam(value = "boardId",required = false)  Long boardId) {
+    public AppResult<List<Article>> getAllByBoardId(@Parameter(description = "板块id") @RequestParam(value = "boardId", required = false) Long boardId) {
         List<Article> articles;
         //查询所有列表
-        if(boardId == null) {
-             articles = articleService.selectAll();
-        }else {
-             articles = articleService.selectAllByBoardId(boardId);
+        if (boardId == null) {
+            articles = articleService.selectAll();
+        } else {
+            articles = articleService.selectAllByBoardId(boardId);
         }
-        if(articles == null) {
+        if (articles == null) {
             articles = new ArrayList<>();
         }
         return AppResult.success(articles);
@@ -99,20 +101,20 @@ public class ArticleController {
 
     @Operation(summary = "根据Id查询帖⼦详情")
     @GetMapping("/details")
-    public  AppResult<Article> getDetails(HttpServletRequest request,
-                                          @Parameter(description = "帖子id") @RequestParam(value = "id") @NonNull Long id) {
+    public AppResult<Article> getDetails(HttpServletRequest request,
+                                         @Parameter(description = "帖子id") @RequestParam(value = "id") @NonNull Long id) {
 
         // 从session中获取当前登录的用户
         HttpSession session = request.getSession(false);
-        User user =(User)session.getAttribute(AppConfig.USER_SESSION);
+        User user = (User) session.getAttribute(AppConfig.USER_SESSION);
 
         // 调用Service，获取帖子详情
         Article article = articleService.selectDetailById(id);
-        if(article == null) {
+        if (article == null) {
             return AppResult.failed(ResultCode.FAILED_ARTICLE_NOT_EXISTS);
         }
         // 判断当前用户是否为作者
-        if(user.getId() == article.getUserId()) {
+        if (user.getId() == article.getUserId()) {
             article.setOwn(true);
         }
         return AppResult.success(article);
@@ -130,7 +132,7 @@ public class ArticleController {
         User user = (User) session.getAttribute(AppConfig.USER_SESSION);
 
         // 校验用户状态
-        if(user.getState() == 1) {
+        if (user.getState() == 1) {
             // 返回错误描述
             return AppResult.failed(ResultCode.FAILED_USER_BANNED);
         }
@@ -141,12 +143,28 @@ public class ArticleController {
             return AppResult.failed(ResultCode.FAILED_ARTICLE_NOT_EXISTS);
         }
         // 判断帖子的状态 - 已归档
-        if(article.getState() == 1 || article.getDeleteState() == 1) {
+        if (article.getState() == 1 || article.getDeleteState() == 1) {
             return AppResult.failed(ResultCode.FAILED_ARTICLE_BANNED);
         }
 
         articleService.modify(id, title, content);
         log.info("帖子更新成功. Article id = " + id + "User id = " + user.getId() + ".");
+        return AppResult.success();
+    }
+
+    @Operation(summary = "点赞")
+    @PostMapping("thumbsUp")
+    public AppResult thumbsUp(HttpServletRequest request,
+                              @Parameter(description = "帖子id") @RequestParam("id") @NonNull Long id) {
+
+
+        HttpSession session = request.getSession(false);
+        User user = (User) session.getAttribute(AppConfig.USER_SESSION);
+        if(user.getState() == 1) {
+            //用户禁言了
+            return AppResult.failed(ResultCode.FAILED_USER_BANNED);
+        }
+        articleService.thumbsUpById(id);
         return AppResult.success();
     }
 }
