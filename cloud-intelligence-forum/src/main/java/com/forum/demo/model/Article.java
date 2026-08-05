@@ -34,4 +34,7 @@ public class Article {
     // ⽤⼾信息
     private User user;
 
+    //板块信息
+    private Board board;
+
 }

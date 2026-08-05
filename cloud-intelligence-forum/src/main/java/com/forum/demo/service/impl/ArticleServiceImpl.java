@@ -57,23 +57,23 @@ public class ArticleServiceImpl implements IArticleService {
         }
 
         // 获取用户信息
-        User user = userService.selectById(article.getId());
+        User user = userService.selectById(article.getUserId());
         //没有找到指定用户信息
         if(user == null) {
-            log.warn(ResultCode.FAILED_CREATE.toString() + ", 发贴失败, user id = " + article.getBoardId());
+            log.warn(ResultCode.FAILED_CREATE.toString() + ", 发贴失败, user id = " + article.getUserId());
             throw new ApplicationException(AppResult.failed(ResultCode.FAILED_CREATE));
         }
         // 更新用户的发贴数
         userService.addOneArticleCountById(user.getId());
 
-        Board board = boardService.selectById(article.getId());
+        Board board = boardService.selectById(article.getBoardId());
         //没有找到指定板块
         if(board == null) {
             log.warn(ResultCode.FAILED_CREATE.toString() + ", 发贴失败, board id = " + article.getBoardId());
             throw new ApplicationException(AppResult.failed(ResultCode.FAILED_CREATE));
         }
         //更新
-        boardService.addOneArticleCountById(article.getId());
+        boardService.addOneArticleCountById(article.getBoardId());
 
         // 打印日志
         log.info(ResultCode.SUCCESS.toString() + ", user id = " + article.getUserId()
@@ -84,6 +84,23 @@ public class ArticleServiceImpl implements IArticleService {
     @Override
     public List<Article> selectAll() {
         List<Article> articles = articleMapper.selectAll();
+        return articles;
+    }
+
+    @Override
+    public List<Article> selectAllByBoardId(Long boardId) {
+        //非空校验
+        if(boardId == null || boardId <= 0) {
+            log.warn(ResultCode.FAILED_PARAMS_VALIDATE.toString());
+            throw new ApplicationException(AppResult.failed(ResultCode.FAILED_PARAMS_VALIDATE));
+        }
+        //查询板块是否存在
+        if(boardId.equals(boardService.selectById(boardId))) {
+            log.warn(ResultCode.FAILED_BOARD_NOT_EXISTS.toString());
+            throw new ApplicationException(AppResult.failed(ResultCode.FAILED_BOARD_NOT_EXISTS));
+        }
+        //调用dao
+        List<Article> articles = articleMapper.selectAllByBoardId(boardId);
         return articles;
     }
 }

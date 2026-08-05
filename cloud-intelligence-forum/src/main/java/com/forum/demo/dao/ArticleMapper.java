@@ -1,7 +1,9 @@
 package com.forum.demo.dao;
 
 import com.forum.demo.model.Article;
+import io.swagger.v3.oas.annotations.Parameter;
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
 
@@ -24,4 +26,10 @@ public interface ArticleMapper {
      * @return
      */
     List<Article> selectAll();
+
+    /**
+     * 根据板块id查询帖子列表
+     * @return
+     */
+    List<Article> selectAllByBoardId(@Param("boardId") Long boardId);
 }
