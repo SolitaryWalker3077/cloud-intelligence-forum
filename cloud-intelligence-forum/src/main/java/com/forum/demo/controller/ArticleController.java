@@ -167,4 +167,32 @@ public class ArticleController {
         articleService.thumbsUpById(id);
         return AppResult.success();
     }
+
+    @Operation(summary = "删除帖子")
+    @PostMapping("/delete")
+    public AppResult deleteById(HttpServletRequest request,
+                                @Parameter(description = "帖子id") @RequestParam("id") @NonNull Long id) {
+
+        HttpSession session = request.getSession(false);
+        User user =(User) session.getAttribute(AppConfig.USER_SESSION);
+        //查询用户状态
+        if(user.getState() == 1) {
+            //用户禁言了
+            return AppResult.failed(ResultCode.FAILED_USER_BANNED);
+        }
+        //查询帖子状态
+        Article article = articleService.selectById(id);
+        if(article == null || article.getDeleteState() == 1) {
+            // 帖子已删除
+            return AppResult.failed(ResultCode.FAILED_ARTICLE_NOT_EXISTS);
+        }
+        // 校验当前登录的用户是不是作者
+        if(user.getId() != article.getUserId()) {
+            return AppResult.failed(ResultCode.FAILED_FORBIDDEN);
+        }
+        // 调用Service
+        articleService.deleteById(id);
+        // 返回操作成功
+        return AppResult.success();
+    }
 }
