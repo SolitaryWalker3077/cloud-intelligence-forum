@@ -6,6 +6,7 @@ import com.forum.demo.service.IUserService;
 import com.forum.demo.utils.Md5Utils;
 import com.forum.demo.utils.UuidUtil;
 import jakarta.annotation.Resource;
+import org.junit.jupiter.api.Tags;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.transaction.annotation.Transactional;
@@ -58,6 +59,13 @@ class UserServiceImplTest {
     @Test
     void addOneArticleCountById() {
         userService.addOneArticleCountById(1L);
+        System.out.println("更新成功");
+    }
+
+    @Transactional
+    @Test
+    void subOneArticleCountById() {
+        userService.subOneArticleCountById(1L);
         System.out.println("更新成功");
     }
 }

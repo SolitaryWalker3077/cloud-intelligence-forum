@@ -5,6 +5,7 @@ import io.swagger.v3.oas.models.security.SecurityScheme;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.function.LongFunction;
 
 public interface IArticleService {
 
@@ -60,4 +61,12 @@ public interface IArticleService {
      * @param id
      */
     void thumbsUpById(Long id);
+
+    /**
+     * 根据Id删除帖子
+     * @param id 帖子Id
+     */
+    @Transactional // 事务管理
+    void deleteById(Long id);
+
 }

@@ -66,4 +66,31 @@ public class BoardServiceImpl implements IBoardService {
             throw new ApplicationException(AppResult.failed(ResultCode.FAILED));
         }
     }
+
+    @Override
+    public void subOneArticleCountById(Long id) {
+        if(id == null || id <= 0) {
+            log.warn(ResultCode.FAILED_BOARD_ARTICLE_COUNT.toString());
+            throw new ApplicationException(AppResult.failed(ResultCode.FAILED_BOARD_ARTICLE_COUNT));
+        }
+        //查询对应的板块
+        Board board = boardMapper.selectByPrimaryKey(id);
+        if(board == null) {
+            log.warn(ResultCode.FAILED_BOARD_NOT_EXISTS.toString());
+            throw new ApplicationException(AppResult.failed(ResultCode.FAILED_BOARD_NOT_EXISTS));
+        }
+        //更新数据库信息
+        Board updateBoard = new Board();
+        updateBoard.setId(board.getId());
+        updateBoard.setArticleCount(board.getArticleCount()-1);
+        if(updateBoard.getArticleCount()<0) {
+            //如果帖子数量<0,就把数量设置为0
+            updateBoard.setArticleCount(0);
+        }
+        int row = boardMapper.updateByPrimaryKeySelective(updateBoard);
+        if(row != 1) {
+            log.warn(ResultCode.FAILED.toString() + ", 受影响的行数不等于 1 .");
+            throw new ApplicationException(AppResult.failed(ResultCode.FAILED));
+        }
+    }
 }

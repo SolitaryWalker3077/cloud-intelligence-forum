@@ -53,4 +53,10 @@ class ArticleServiceImplTest {
         Article article = articleService.selectDetailById(1l);
         System.out.println(objectMapper.writeValueAsString(article));
     }
+
+    @Test
+    void deleteById() {
+        articleService.deleteById(6l);
+        System.out.println("删除成功");
+    }
 }

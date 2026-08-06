@@ -41,4 +41,11 @@ public interface IUserService {
      * @param id 用户id
      */
     void addOneArticleCountById(Long id);
+
+
+    /**
+     * 用户发帖数 -1
+     * @param id 版块Id
+     */
+    void subOneArticleCountById(Long id);
 }
