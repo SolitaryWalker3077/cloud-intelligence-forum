@@ -3,6 +3,8 @@ package com.forum.demo.service;
 import com.forum.demo.model.ArticleReply;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+
 public interface IArticleReplyService {
     /**
      * 新增帖子回复
@@ -10,4 +12,11 @@ public interface IArticleReplyService {
      */
     @Transactional
     void create(ArticleReply articleReply);
+
+    /**
+     * 根据帖子Id查询所有的回复
+     * @param articleId
+     * @return
+     */
+    List<ArticleReply> selectByArticleId(Long articleId);
 }

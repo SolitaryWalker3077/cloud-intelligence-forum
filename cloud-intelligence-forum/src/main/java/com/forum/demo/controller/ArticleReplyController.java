@@ -8,16 +8,16 @@ import com.forum.demo.model.ArticleReply;
 import com.forum.demo.model.User;
 import com.forum.demo.service.IArticleReplyService;
 import com.forum.demo.service.IArticleService;
+import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.annotation.Resource;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 import lombok.NonNull;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @Tag(name = "回复接口")
 @RestController
@@ -30,6 +30,7 @@ public class ArticleReplyController {
     private IArticleReplyService articleReplyService;
 
 
+    @Operation(summary = "回复帖子")
     @PostMapping("/create")
     public AppResult create(HttpServletRequest request,
                             @Parameter(description = "帖子id") @RequestParam("articleId") @NonNull Long articleId,
@@ -62,5 +63,18 @@ public class ArticleReplyController {
         articleReplyService.create(articleReply);
         // 返回结果
         return AppResult.success();
+    }
+
+    @Operation(summary = "回复列表")
+    @GetMapping("/getReplies")
+    public AppResult<List<ArticleReply>> getRepliesByArticleId(@Parameter(description = "帖子id") @RequestParam("articleId") @NonNull Long articleId) {
+        //检查帖子是否存在
+        Article article = articleService.selectById(articleId);
+        if(article == null || article.getDeleteState() == 1) {
+            // 返回错误提示
+            return AppResult.failed(ResultCode.FAILED_ARTICLE_NOT_EXISTS);
+        }
+        List<ArticleReply> articleReplies = articleReplyService.selectByArticleId(articleId);
+        return AppResult.success(articleReplies);
     }
 }

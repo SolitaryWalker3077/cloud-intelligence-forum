@@ -13,6 +13,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.util.Date;
+import java.util.List;
 
 @Slf4j
 @Service
@@ -57,5 +58,21 @@ public class ArticleReplyServiceImpl implements IArticleReplyService {
         // 打印日志
         log.info("回复成功, article id = " + articleReply.getArticleId() + ", user id = " +
                 articleReply.getPostUserId());
+    }
+
+
+    @Override
+    public List<ArticleReply> selectByArticleId(Long articleId) {
+        //非空校验
+        if(articleId == null || articleId <= 0) {
+            // 打印日志
+            log.warn(ResultCode.FAILED_PARAMS_VALIDATE.toString());
+            // 抛出异常
+            throw new ApplicationException(AppResult.failed(ResultCode.FAILED_PARAMS_VALIDATE));
+        }
+        //调用dao
+        List<ArticleReply> result = articleReplyMapper.selectByArticleId(articleId);
+
+        return result;
     }
 }
