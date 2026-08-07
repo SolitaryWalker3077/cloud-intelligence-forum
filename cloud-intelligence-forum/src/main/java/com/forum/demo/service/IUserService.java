@@ -48,4 +48,11 @@ public interface IUserService {
      * @param id 版块Id
      */
     void subOneArticleCountById(Long id);
+
+
+    /**
+     * 修改个人信息
+     * @param user 要更新的对象
+     */
+    void modifyInfo (User user);
 }

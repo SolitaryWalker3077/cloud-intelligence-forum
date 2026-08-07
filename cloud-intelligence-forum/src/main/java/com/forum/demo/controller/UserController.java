@@ -125,4 +125,58 @@ public class UserController {
         }
         return AppResult.success("退出成功");
     }
+
+    /**
+     * 修改个人信息
+     * @param username 用户名
+     * @param nickname 昵称
+     * @param gender 性别
+     * @param email 邮箱
+     * @param phoneNum 电话号
+     * @param remark 个人简介
+     * @return AppResult
+     */
+    @Operation(summary = "修改个人信息")
+    @PostMapping("/modifyInfo")
+    public AppResult modifyInfo (HttpServletRequest request,
+                                 @Parameter(description = "用户名") @RequestParam(value = "username",required = false) String username,
+                                 @Parameter(description = "昵称") @RequestParam(value = "nickname",required = false) String nickname,
+                                 @Parameter(description = "性别") @RequestParam(value = "gender",required = false) Byte gender,
+                                 @Parameter(description = "邮箱") @RequestParam(value = "email",required = false) String email,
+                                 @Parameter(description = "电话号") @RequestParam(value = "phoneNum",required = false) String phoneNum,
+                                 @Parameter(description = "个人简介") @RequestParam(value = "remark",required = false) String remark) {
+        // 1. 接收参数
+        // 2. 对参数做非空校验（全部都为空，则返回错误描述）
+        if (StringUtil.isEmpty(username) && StringUtil.isEmpty(nickname)
+                && StringUtil.isEmpty(email) && StringUtil.isEmpty(phoneNum)
+                && StringUtil.isEmpty(remark) && gender == null) {
+            // 返回错误信息
+            return AppResult.failed("请输入要修改的内容");
+        }
+
+        // 从session中获取用户Id
+        HttpSession session = request.getSession(false);
+        User user = (User) session.getAttribute(AppConfig.USER_SESSION);
+
+        // 3. 封装对象
+        User updateUser = new User();
+        updateUser.setId(user.getId()); // 用户Id
+        updateUser.setUsername(username); // 用户名
+        updateUser.setNickname(nickname); // 昵称
+        updateUser.setGender(gender); // 性别
+        updateUser.setEmail(email); // 邮箱
+        updateUser.setPhoneNum(phoneNum); // 电话
+        updateUser.setRemark(remark); // 个人简介
+
+        // 4. 调用Service中的方法
+        userService.modifyInfo(updateUser);
+        // 5. 查询最新的用户信息
+        user = userService.selectById(user.getId());
+        // 6. 把最新的用户信息设置到session中
+        session.setAttribute(AppConfig.USER_SESSION, user);
+        // 7. 返回结果
+        return AppResult.success(user);
+    }
+
+
 }
