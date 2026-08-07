@@ -34,9 +34,9 @@ public class ArticleServiceImpl implements IArticleService {
     @Override
     public void create(Article article) {
         //非空校验
-        if(article == null || article.getBoardId() == null || article.getUserId() == null
-            || StringUtil.isEmpty(article.getTitle())
-            || StringUtil.isEmpty(article.getContent())) {
+        if (article == null || article.getBoardId() == null || article.getUserId() == null
+                || StringUtil.isEmpty(article.getTitle())
+                || StringUtil.isEmpty(article.getContent())) {
             log.warn(ResultCode.FAILED_PARAMS_VALIDATE.toString());
             throw new ApplicationException(AppResult.failed(ResultCode.FAILED_PARAMS_VALIDATE));
         }
@@ -51,7 +51,7 @@ public class ArticleServiceImpl implements IArticleService {
         article.setUpdateTime(date);
         // 写入数据库
         int articleRow = articleMapper.insertSelective(article);
-        if(articleRow<=0) {
+        if (articleRow <= 0) {
             log.warn(ResultCode.FAILED_CREATE.toString());
             throw new ApplicationException(AppResult.failed(ResultCode.FAILED_CREATE));
         }
@@ -59,7 +59,7 @@ public class ArticleServiceImpl implements IArticleService {
         // 获取用户信息
         User user = userService.selectById(article.getUserId());
         //没有找到指定用户信息
-        if(user == null) {
+        if (user == null) {
             log.warn(ResultCode.FAILED_CREATE.toString() + ", 发贴失败, user id = " + article.getUserId());
             throw new ApplicationException(AppResult.failed(ResultCode.FAILED_CREATE));
         }
@@ -68,7 +68,7 @@ public class ArticleServiceImpl implements IArticleService {
 
         Board board = boardService.selectById(article.getBoardId());
         //没有找到指定板块
-        if(board == null) {
+        if (board == null) {
             log.warn(ResultCode.FAILED_CREATE.toString() + ", 发贴失败, board id = " + article.getBoardId());
             throw new ApplicationException(AppResult.failed(ResultCode.FAILED_CREATE));
         }
@@ -77,7 +77,7 @@ public class ArticleServiceImpl implements IArticleService {
 
         // 打印日志
         log.info(ResultCode.SUCCESS.toString() + ", user id = " + article.getUserId()
-                + ", board id = " + article.getBoardId() + ", article id = "+article.getId() + "发帖成功");
+                + ", board id = " + article.getBoardId() + ", article id = " + article.getId() + "发帖成功");
     }
 
 
@@ -90,12 +90,12 @@ public class ArticleServiceImpl implements IArticleService {
     @Override
     public List<Article> selectAllByBoardId(Long boardId) {
         //非空校验
-        if(boardId == null || boardId <= 0) {
+        if (boardId == null || boardId <= 0) {
             log.warn(ResultCode.FAILED_PARAMS_VALIDATE.toString());
             throw new ApplicationException(AppResult.failed(ResultCode.FAILED_PARAMS_VALIDATE));
         }
         //查询板块是否存在
-        if(boardId.equals(boardService.selectById(boardId))) {
+        if (boardId.equals(boardService.selectById(boardId))) {
             log.warn(ResultCode.FAILED_BOARD_NOT_EXISTS.toString());
             throw new ApplicationException(AppResult.failed(ResultCode.FAILED_BOARD_NOT_EXISTS));
         }
@@ -106,35 +106,35 @@ public class ArticleServiceImpl implements IArticleService {
 
     @Override
     public Article selectDetailById(Long id) {
-        if(id == null || id <= 0) {
+        if (id == null || id <= 0) {
             log.warn(ResultCode.FAILED_PARAMS_VALIDATE.toString());
             throw new ApplicationException(AppResult.failed(ResultCode.FAILED_PARAMS_VALIDATE));
         }
         //调用dao
         Article article = articleMapper.selectDetailById(id);
-        if(article == null) {
+        if (article == null) {
             log.warn(ResultCode.FAILED_ARTICLE_NOT_EXISTS.toString());
             throw new ApplicationException(AppResult.failed(ResultCode.FAILED_ARTICLE_NOT_EXISTS));
         }
         // 更新帖子的访问次数
         Article updateArticle = new Article();
         updateArticle.setId(article.getId());
-        updateArticle.setVisitCount(article.getVisitCount()+1);
+        updateArticle.setVisitCount(article.getVisitCount() + 1);
         // 保存到数据库
         int row = articleMapper.updateByPrimaryKeySelective(updateArticle);
-        if(row != 1) {
+        if (row != 1) {
             log.warn(ResultCode.ERROR_SERVICES.toString());
             throw new ApplicationException(AppResult.failed(ResultCode.ERROR_SERVICES));
         }
         // 更新返回对象的访问次数
-        article.setVisitCount(article.getVisitCount()+1);
+        article.setVisitCount(article.getVisitCount() + 1);
         return article;
     }
 
 
     @Override
     public Article selectById(Long id) {
-        if(id == null || id <= 0) {
+        if (id == null || id <= 0) {
             // 打印日志
             log.warn(ResultCode.FAILED_PARAMS_VALIDATE.toString());
             // 抛出异常
@@ -147,8 +147,8 @@ public class ArticleServiceImpl implements IArticleService {
     @Override
     public void modify(Long id, String title, String content) {
         //非空校验
-        if(id == null || id <= 0 || StringUtil.isEmpty(title)
-        ||StringUtil.isEmpty(content)) {
+        if (id == null || id <= 0 || StringUtil.isEmpty(title)
+                || StringUtil.isEmpty(content)) {
             log.warn(ResultCode.FAILED_PARAMS_VALIDATE.toString());
             throw new ApplicationException(AppResult.failed(ResultCode.FAILED_PARAMS_VALIDATE));
         }
@@ -161,7 +161,7 @@ public class ArticleServiceImpl implements IArticleService {
         updatearticle.setUpdateTime(new Date());
         //调用dao
         int row = articleMapper.updateByPrimaryKeySelective(updatearticle);
-        if(row != 1) {
+        if (row != 1) {
             // 打印日志
             log.warn(ResultCode.ERROR_SERVICES.toString());
             // 抛出异常
@@ -171,7 +171,7 @@ public class ArticleServiceImpl implements IArticleService {
 
     @Override
     public void thumbsUpById(Long id) {
-        if(id == null || id <= 0) {
+        if (id == null || id <= 0) {
             log.warn(ResultCode.FAILED_PARAMS_VALIDATE.toString());
             // 抛出异常
             throw new ApplicationException(AppResult.failed(ResultCode.FAILED_PARAMS_VALIDATE));
@@ -179,14 +179,14 @@ public class ArticleServiceImpl implements IArticleService {
         //调用dao
         Article article = articleMapper.selectByPrimaryKey(id);
         //校验帖子是否存在
-        if(article == null || article.getDeleteState() == 1) {
+        if (article == null || article.getDeleteState() == 1) {
             // 打印日志
             log.warn(ResultCode.FAILED_ARTICLE_NOT_EXISTS.toString());
             // 抛出异常
             throw new ApplicationException(AppResult.failed(ResultCode.FAILED_ARTICLE_NOT_EXISTS));
         }
         //校验帖子状态
-        if(article.getState() != 0) {
+        if (article.getState() != 0) {
             // 打印日志
             log.warn(ResultCode.FAILED_ARTICLE_BANNED.toString());
             // 抛出异常
@@ -195,10 +195,10 @@ public class ArticleServiceImpl implements IArticleService {
         // 构造要更新的对象
         Article updateArticle = new Article();
         updateArticle.setId(id);
-        updateArticle.setLikeCount(article.getLikeCount()+1);
+        updateArticle.setLikeCount(article.getLikeCount() + 1);
 
         int row = articleMapper.updateByPrimaryKeySelective(updateArticle);
-        if(row != 1) {
+        if (row != 1) {
             // 打印日志
             log.warn(ResultCode.ERROR_SERVICES.toString());
             // 抛出异常
@@ -208,7 +208,7 @@ public class ArticleServiceImpl implements IArticleService {
 
     @Override
     public void deleteById(Long id) {
-        if(id == null || id <= 0) {
+        if (id == null || id <= 0) {
             // 打印日志
             log.warn(ResultCode.FAILED_PARAMS_VALIDATE.toString());
             // 抛出异常
@@ -216,7 +216,7 @@ public class ArticleServiceImpl implements IArticleService {
         }
         // 根据Id查询帖子信息
         Article article = articleMapper.selectByPrimaryKey(id);
-        if(article == null || article.getDeleteState() == 1) {
+        if (article == null || article.getDeleteState() == 1) {
             // 打印日志
             log.warn(ResultCode.FAILED_BOARD_NOT_EXISTS.toString() + ", article id = " + id);
             // 抛出异常
@@ -239,6 +239,44 @@ public class ArticleServiceImpl implements IArticleService {
         // 更新用户发帖数
         userService.subOneArticleCountById(article.getUserId());
         log.info("删除帖子成功, article id = " + article.getId() + ", user id = " + article.getUserId() + ".");
+    }
 
+    @Override
+    public void addOneReplyCountById(Long id) {
+        if (id == null || id <= 0) {
+            // 打印日志
+            log.warn(ResultCode.FAILED_PARAMS_VALIDATE.toString());
+            // 抛出异常
+            throw new ApplicationException(AppResult.failed(ResultCode.FAILED_PARAMS_VALIDATE));
+        }
+        //查询帖子信息
+        Article article = articleMapper.selectByPrimaryKey(id);
+        //校验帖子状态
+        if (article == null || article.getDeleteState() == 1) {
+            // 打印日志
+            log.warn(ResultCode.FAILED_ARTICLE_NOT_EXISTS.toString());
+            // 抛出异常
+            throw new ApplicationException(AppResult.failed(ResultCode.FAILED_ARTICLE_NOT_EXISTS));
+        }
+        // 帖子已封帖
+        if (article.getState() == 1) {
+            // 打印日志
+            log.warn(ResultCode.FAILED_ARTICLE_BANNED.toString());
+            // 抛出异常
+            throw new ApplicationException(AppResult.failed(ResultCode.FAILED_ARTICLE_BANNED));
+        }
+        Article updateArticle = new Article();
+        updateArticle.setId(article.getId());
+        updateArticle.setReplyCount(article.getReplyCount() + 1);
+        updateArticle.setUpdateTime(new Date());
+
+        int row = articleMapper.updateByPrimaryKeySelective(updateArticle);
+        if (row != 1) {
+            // 打印日志
+            log.warn(ResultCode.ERROR_SERVICES.toString());
+            // 抛出异常
+            throw new ApplicationException(AppResult.failed(ResultCode.ERROR_SERVICES));
+        }
     }
 }
+
