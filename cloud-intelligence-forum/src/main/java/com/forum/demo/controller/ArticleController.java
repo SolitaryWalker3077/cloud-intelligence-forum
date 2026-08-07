@@ -195,4 +195,19 @@ public class ArticleController {
         // 返回操作成功
         return AppResult.success();
     }
+
+
+    @Operation(summary = "获取用户的帖子列表")
+    @GetMapping("/getAllByUserId")
+    public AppResult<List<Article>>  getAllByUserId(HttpServletRequest request,
+                                                    @Parameter(description = "userId") @RequestParam(value = "userId",required = false) Long userId) {
+
+        if(userId == null) {
+            HttpSession session = request.getSession(false);
+            User user = (User) session.getAttribute(AppConfig.USER_SESSION);
+            userId = user.getId();
+        }
+        List<Article> articles = articleService.selectByUserId(userId);
+        return AppResult.success(articles);
+    }
 }

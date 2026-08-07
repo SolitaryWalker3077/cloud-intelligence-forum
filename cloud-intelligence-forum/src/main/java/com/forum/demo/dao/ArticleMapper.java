@@ -4,6 +4,7 @@ import com.forum.demo.model.Article;
 import io.swagger.v3.oas.annotations.Parameter;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import java.util.List;
 
@@ -39,4 +40,12 @@ public interface ArticleMapper {
      * @return 帖子详情
      */
     Article selectDetailById(@Param("id") Long id);
+
+
+    /**
+     * 根据用户Id查询帖子列表
+     * @param userId 用户Id
+     * @return 帖子列表
+     */
+    List<Article> selectByUserId(@RequestParam("userId") Long userId);
 }
