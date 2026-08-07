@@ -178,5 +178,27 @@ public class UserController {
         return AppResult.success(user);
     }
 
-
+    @Operation(summary = "修改密码")
+    @PostMapping("/modifyPwd")
+    public AppResult modifyPassword (HttpServletRequest request,
+                                     @Parameter(description = "原密码") @RequestParam("oldPassword") @NonNull String oldPassword,
+                                     @Parameter(description = "新密码") @RequestParam("newPassword") @NonNull String newPassword,
+                                     @Parameter(description = "确认密码") @RequestParam("passwordRepeat") @NonNull String passwordRepeat) {
+        // 1. 校验新密码与确认密码是否相同
+        if (!newPassword.equals(passwordRepeat)) {
+            // 返回错误描述
+            return AppResult.failed(ResultCode.FAILED_TWO_PWD_NOT_SAME);
+        }
+        // 2. 获取当前登录的用户信息
+        HttpSession session = request.getSession(false);
+        User user = (User) session.getAttribute(AppConfig.USER_SESSION);
+        // 3. 调用Service
+        userService.modifyPassword(user.getId(), newPassword, oldPassword);
+        // 4. 销毁session
+        if (session != null) {
+            session.invalidate();
+        }
+        // 5. 返回结果
+        return AppResult.success();
+    }
 }
